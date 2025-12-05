@@ -24,6 +24,7 @@
     },
     "devDependencies": {
         "@tailwindcss/postcss": "^4",
+        "baseline-browser-mapping": "^2.9.2",
         "prettier": "^3.6.2",
         "tailwindcss": "^4"
     },

@@ -20,8 +20,6 @@ export default function SellPage() {
     const name = searchParams.get("name");
     const image = searchParams.get("image");
 
-    console.log("Sell Page - NFT Details:", { contract, tokenId, name, address });
-
     const {
         isApproved,
         approve,
@@ -29,24 +27,30 @@ export default function SellPage() {
         isConfirming: isApproveConfirming,
         isSuccess: isApproveSuccess,
         error: approveError,
+        refetch: refetchApproval,
     } = useNFTApproval(contract, tokenId, address);
 
-    console.log("Approval Status:", {
-        isApproved,
-        isPending: isApprovePending,
-        isConfirming: isApproveConfirming,
-        isSuccess: isApproveSuccess,
-    });
-
-    const { data: listHash, writeContract: listNFT, isPending: isListPending } = useWriteContract();
+    const { data: listHash, writeContract: listNFT, isPending: isListPending, error: listError } = useWriteContract();
     const { isLoading: isListConfirming, isSuccess: isListSuccess } = useWaitForTransactionReceipt({
         hash: listHash,
     });
 
+    // Console logging for debugging
+    console.log("=== SELL PAGE STATE ===");
+    console.log("Current Step:", currentStep);
+    console.log("Price:", price);
+    console.log("Is Approved:", isApproved);
+    console.log("Marketplace Address:", MARKETPLACE_CONTRACT_ADDRESS);
+    console.log("Contract:", contract);
+    console.log("Token ID:", tokenId);
+
     // Handle approval success
     useEffect(() => {
         if (isApproveSuccess) {
+            console.log("✅ Approval successful!");
             toast.success("NFT approved! Now you can list it.");
+            // Refetch approval status to ensure it's updated
+            refetchApproval();
             setCurrentStep(3);
         }
     }, [isApproveSuccess]);
@@ -54,28 +58,41 @@ export default function SellPage() {
     // Handle approval error
     useEffect(() => {
         if (approveError) {
-            console.error("Approval error:", approveError);
+            console.error("❌ Approval error:", approveError);
             toast.error("Approval failed: " + approveError.message);
         }
     }, [approveError]);
 
+    // Handle listing error
+    useEffect(() => {
+        if (listError) {
+            console.error("❌ Listing error:", listError);
+            toast.error("Listing failed: " + (listError.message || "Unknown error"));
+        }
+    }, [listError]);
+
     // Handle listing success
     useEffect(() => {
         if (isListSuccess) {
+            console.log("✅ NFT listed successfully!");
             toast.success("NFT listed successfully!");
-            setTimeout(() => router.push("/my-listings"), 2000);
+            setTimeout(() => {
+                router.push("/my-listings");
+            }, 2000);
         }
-    }, [isListSuccess]);
+    }, [isListSuccess, router]);
 
-    // Auto-advance to step 3 if already approved
+    // Auto-advance to step 3 if already approved (e.g., coming back to page)
     useEffect(() => {
         if (isApproved && currentStep === 1 && price) {
-            console.log("NFT already approved, skipping to step 3");
+            console.log("ℹ️ NFT already approved, auto-advancing to step 3");
             setCurrentStep(3);
         }
-    }, [isApproved, price]);
+    }, [isApproved, currentStep, price]);
 
     const handleApprove = () => {
+        console.log("🔵 handleApprove called");
+
         if (!price || parseFloat(price) <= 0) {
             toast.error("Please enter a valid price first");
             return;
@@ -86,37 +103,68 @@ export default function SellPage() {
         approve();
     };
 
-    const handleList = () => {
+    const handleList = async () => {
+        console.log("🟢 handleList called");
+        console.log("Price value:", price);
+        console.log("Is Approved:", isApproved);
+        console.log("Contract:", contract);
+        console.log("Token ID:", tokenId);
+        console.log("Marketplace:", MARKETPLACE_CONTRACT_ADDRESS);
+
+        // Validation checks
         if (!price || parseFloat(price) <= 0) {
+            console.error("❌ Invalid price");
             toast.error("Please enter a valid price");
             return;
         }
 
         if (!isApproved) {
+            console.error("❌ NFT not approved");
             toast.error("Please approve the NFT first");
             return;
         }
 
-        console.log("Listing NFT:", {
-            contract,
-            tokenId,
-            price: parseEther(price),
-        });
+        if (!contract || !tokenId) {
+            console.error("❌ Missing contract or tokenId");
+            toast.error("NFT information is missing");
+            return;
+        }
+
+        if (!MARKETPLACE_CONTRACT_ADDRESS) {
+            console.error("❌ Marketplace address not configured");
+            toast.error("Marketplace address not configured");
+            return;
+        }
+
+        console.log("✅ All validations passed");
 
         try {
-            listNFT({
+            const priceInWei = parseEther(price);
+            const tokenIdBigInt = BigInt(tokenId);
+
+            console.log("Calling listNFT with:", {
+                marketplace: MARKETPLACE_CONTRACT_ADDRESS,
+                nftContract: contract,
+                tokenId: tokenIdBigInt.toString(),
+                price: priceInWei.toString(),
+            });
+
+            await listNFT({
                 address: MARKETPLACE_CONTRACT_ADDRESS,
                 abi: MARKETPLACE_ABI,
                 functionName: "listItem",
-                args: [contract, BigInt(tokenId), parseEther(price)],
+                args: [contract, tokenIdBigInt, priceInWei],
             });
+
+            console.log("✅ listNFT function called successfully");
         } catch (error) {
-            console.error("Listing error:", error);
-            toast.error("Failed to list NFT");
+            console.error("❌ Error in handleList:", error);
+            toast.error("Failed to list NFT: " + (error.message || "Unknown error"));
         }
     };
 
     const handleEditPrice = () => {
+        console.log("📝 Edit price clicked, returning to step 1");
         setCurrentStep(1);
     };
 
@@ -126,17 +174,15 @@ export default function SellPage() {
                 <div className="text-6xl mb-4">⚠️</div>
                 <h2 className="text-2xl font-bold mb-4">No NFT Selected</h2>
                 <p className="text-gray-600 mb-6">Please select an NFT from "My NFTs" to list</p>
-                <a
-                    href="/my-nfts"
-                    className="inline-block bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-semibold"
-                >
-                    Go to My NFTs
-                </a>
+                href="/my-nfts" className="inline-block bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-600
+                font-semibold"
+                <a>Go to My NFTs</a>
             </div>
         );
     }
 
     const imageUrl = resolveIPFS(image);
+    const showListButton = isApproved && currentStep === 3;
 
     return (
         <div className="max-w-2xl mx-auto">
@@ -200,9 +246,7 @@ export default function SellPage() {
 
                         <div className="mb-6">
                             <p className="text-sm text-gray-500 mb-1">Contract</p>
-                            <p className="text-xs font-mono bg-gray-100 p-2 rounded">
-                                {contract?.slice(0, 6)}...{contract?.slice(-4)}
-                            </p>
+                            <p className="text-xs font-mono bg-gray-100 p-2 rounded break-all">{contract}</p>
                         </div>
 
                         <div className="mb-6">
@@ -244,7 +288,7 @@ export default function SellPage() {
                         </div>
 
                         {/* Action Buttons */}
-                        {!isApproved && currentStep === 1 && (
+                        {currentStep === 1 && !isApproved && (
                             <button
                                 onClick={handleApprove}
                                 disabled={!price || parseFloat(price) <= 0}
@@ -254,7 +298,7 @@ export default function SellPage() {
                             </button>
                         )}
 
-                        {!isApproved && currentStep === 2 && (
+                        {currentStep === 2 && !isApproved && (
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                 <p className="text-sm text-blue-800 mb-2 font-semibold">
                                     {isApprovePending || isApproveConfirming
@@ -269,29 +313,28 @@ export default function SellPage() {
                             </div>
                         )}
 
-                        {(isApproved || currentStep === 3) && (
+                        {showListButton && (
                             <>
                                 <button
-                                    onClick={handleList}
+                                    onClick={() => {
+                                        console.log("🔴 LIST BUTTON CLICKED!");
+                                        handleList();
+                                    }}
                                     disabled={!price || parseFloat(price) <= 0 || isListPending || isListConfirming}
                                     className="w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg"
                                 >
                                     {isListPending || isListConfirming ? "⏳ Listing NFT..." : "🚀 List NFT for Sale"}
                                 </button>
-                                {currentStep === 3 && (
-                                    <>
-                                        <p className="text-sm text-green-600 mt-3 flex items-center">
-                                            <span className="mr-2">✅</span>
-                                            NFT is approved - ready to list!
-                                        </p>
-                                        <button
-                                            onClick={handleEditPrice}
-                                            className="w-full mt-2 text-sm text-gray-700 hover:underline"
-                                        >
-                                            Change Price
-                                        </button>
-                                    </>
-                                )}
+                                <p className="text-sm text-green-600 mt-3 flex items-center">
+                                    <span className="mr-2">✅</span>
+                                    NFT is approved - ready to list!
+                                </p>
+                                <button
+                                    onClick={handleEditPrice}
+                                    className="w-full mt-2 text-sm text-gray-700 hover:underline"
+                                >
+                                    Change Price
+                                </button>
                             </>
                         )}
                     </div>

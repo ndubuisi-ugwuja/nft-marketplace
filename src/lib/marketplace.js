@@ -2,18 +2,109 @@ import { ethers } from "ethers";
 
 const MARKETPLACE_ADDRESS = process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS;
 
-// Contract ABI - defines all contract functions
+// Contract ABI - PROPER JSON FORMAT
 export const MARKETPLACE_ABI = [
-    "function listItem(address nftAddress, uint256 tokenId, uint256 price)",
-    "function buyItem(address nftAddress, uint256 tokenId) payable",
-    "function cancelListing(address nftAddress, uint256 tokenId)",
-    "function updateListing(address nftAddress, uint256 tokenId, uint256 newPrice)",
-    "function withdrawProceeds()",
-    "function getListing(address nftAddress, uint256 tokenId) view returns (uint256 price, address seller)",
-    "function getProceeds(address seller) view returns (uint256)",
-    "event ItemListed(address indexed seller, address indexed nftAddress, uint256 indexed tokenId, uint256 price)",
-    "event ItemBought(address indexed buyer, address indexed nftAddress, uint256 indexed tokenId, uint256 price)",
-    "event ItemCanceled(address indexed seller, address indexed nftAddress, uint256 indexed tokenId)",
+    {
+        inputs: [
+            { name: "nftAddress", type: "address" },
+            { name: "tokenId", type: "uint256" },
+            { name: "price", type: "uint256" },
+        ],
+        name: "listItem",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            { name: "nftAddress", type: "address" },
+            { name: "tokenId", type: "uint256" },
+        ],
+        name: "buyItem",
+        outputs: [],
+        stateMutability: "payable",
+        type: "function",
+    },
+    {
+        inputs: [
+            { name: "nftAddress", type: "address" },
+            { name: "tokenId", type: "uint256" },
+        ],
+        name: "cancelListing",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            { name: "nftAddress", type: "address" },
+            { name: "tokenId", type: "uint256" },
+            { name: "newPrice", type: "uint256" },
+        ],
+        name: "updateListing",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [],
+        name: "withdrawProceeds",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            { name: "nftAddress", type: "address" },
+            { name: "tokenId", type: "uint256" },
+        ],
+        name: "getListing",
+        outputs: [
+            { name: "price", type: "uint256" },
+            { name: "seller", type: "address" },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [{ name: "seller", type: "address" }],
+        name: "getProceeds",
+        outputs: [{ name: "", type: "uint256" }],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, name: "seller", type: "address" },
+            { indexed: true, name: "nftAddress", type: "address" },
+            { indexed: true, name: "tokenId", type: "uint256" },
+            { indexed: false, name: "price", type: "uint256" },
+        ],
+        name: "ItemListed",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, name: "buyer", type: "address" },
+            { indexed: true, name: "nftAddress", type: "address" },
+            { indexed: true, name: "tokenId", type: "uint256" },
+            { indexed: false, name: "price", type: "uint256" },
+        ],
+        name: "ItemBought",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, name: "seller", type: "address" },
+            { indexed: true, name: "nftAddress", type: "address" },
+            { indexed: true, name: "tokenId", type: "uint256" },
+        ],
+        name: "ItemCanceled",
+        type: "event",
+    },
 ];
 
 export const MARKETPLACE_CONTRACT_ADDRESS = MARKETPLACE_ADDRESS;
