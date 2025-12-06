@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
+import { getActiveListings } from "../lib/subgraph";
 import { alchemyAPI } from "../lib/alchemy";
 import NFTCard from "../components/NFTCard";
 
@@ -18,61 +19,30 @@ export default function MarketplacePage() {
     const loadMarketplace = async () => {
         setLoading(true);
         try {
-            console.log("🏪 Loading marketplace...");
-
-            // Get all active listings from blockchain events
+            // Get all active listings from The Graph
             const listings = await getActiveListings();
-            console.log(`📋 Found ${listings.length} active listings`);
 
-            if (listings.length === 0) {
-                setNfts([]);
-                setLoading(false);
-                return;
-            }
-
-            // Fetch metadata for each listing from Alchemy
-            console.log("📦 Fetching NFT metadata...");
+            // Fetch metadata from Alchemy
             const nftsWithMetadata = await Promise.all(
                 listings.map(async (listing) => {
-                    try {
-                        console.log(`Fetching metadata for ${listing.nftContract} #${listing.tokenId}`);
+                    const metadata = await alchemyAPI.getNFTMetadata(listing.nftContract, listing.tokenId);
 
-                        const metadata = await alchemyAPI.getNFTMetadata(listing.nftContract, listing.tokenId);
-
-                        return {
-                            contract: { address: listing.nftContract },
-                            tokenId: listing.tokenId,
-                            name: metadata?.title || metadata?.name || `NFT #${listing.tokenId}`,
-                            description: metadata?.description || "No description",
-                            image: metadata?.media?.[0]?.gateway || metadata?.image,
-                            attributes: metadata?.metadata?.attributes || metadata?.attributes || [],
-                            price: listing.price,
-                            seller: listing.seller,
-                        };
-                    } catch (error) {
-                        console.error(`Error fetching metadata for ${listing.nftContract} #${listing.tokenId}:`, error);
-                        // Return listing without full metadata
-                        return {
-                            contract: { address: listing.nftContract },
-                            tokenId: listing.tokenId,
-                            name: `NFT #${listing.tokenId}`,
-                            description: "Metadata unavailable",
-                            image: null,
-                            attributes: [],
-                            price: listing.price,
-                            seller: listing.seller,
-                        };
-                    }
+                    return {
+                        contract: { address: listing.nftContract },
+                        tokenId: listing.tokenId,
+                        name: metadata?.title || `NFT #${listing.tokenId}`,
+                        description: metadata?.description || "",
+                        image: metadata?.media?.[0]?.gateway,
+                        attributes: metadata?.metadata?.attributes || [],
+                        price: BigInt(listing.price),
+                        seller: listing.seller,
+                    };
                 }),
             );
 
-            // Filter out null results
-            const validNfts = nftsWithMetadata.filter((nft) => nft !== null);
-            console.log(`✅ Successfully loaded ${validNfts.length} NFTs`);
-
-            setNfts(validNfts);
+            setNfts(nftsWithMetadata);
         } catch (error) {
-            console.error("❌ Error loading marketplace:", error);
+            console.error("Error:", error);
         }
         setLoading(false);
     };
