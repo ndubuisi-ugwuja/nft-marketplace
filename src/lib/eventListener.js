@@ -9,6 +9,51 @@ const publicClient = createPublicClient({
 });
 
 /**
+ * Fetch events in chunks to work with Alchemy free tier (10 block range limit)
+ */
+const fetchEventsInChunks = async (eventAbi, fromBlock, toBlock, chunkSize = 10000n) => {
+    const allEvents = [];
+    let currentBlock = fromBlock;
+
+    console.log(`Fetching events from block ${fromBlock} to ${toBlock}...`);
+
+    while (currentBlock <= toBlock) {
+        const endBlock = currentBlock + chunkSize > toBlock ? toBlock : currentBlock + chunkSize;
+
+        try {
+            console.log(`Fetching chunk: ${currentBlock} to ${endBlock}`);
+            const events = await publicClient.getLogs({
+                address: MARKETPLACE_CONTRACT_ADDRESS,
+                event: eventAbi,
+                fromBlock: currentBlock,
+                toBlock: endBlock,
+            });
+
+            allEvents.push(...events);
+            console.log(`Found ${events.length} events in this chunk`);
+        } catch (error) {
+            console.error(`Error fetching chunk ${currentBlock}-${endBlock}:`, error);
+            // If chunk is still too large, reduce chunk size and retry
+            if (error.message?.includes("block range") && chunkSize > 10n) {
+                console.log("Reducing chunk size and retrying...");
+                const smallerChunkSize = chunkSize / 10n;
+                const smallerChunkEvents = await fetchEventsInChunks(
+                    eventAbi,
+                    currentBlock,
+                    endBlock,
+                    smallerChunkSize,
+                );
+                allEvents.push(...smallerChunkEvents);
+            }
+        }
+
+        currentBlock = endBlock + 1n;
+    }
+
+    return allEvents;
+};
+
+/**
  * Get all active listings from blockchain events
  * This reads ItemListed, ItemBought, and ItemCanceled events
  */
@@ -17,45 +62,42 @@ export const getActiveListings = async () => {
         console.log("🔍 Fetching marketplace events...");
         console.log("Marketplace Address:", MARKETPLACE_CONTRACT_ADDRESS);
 
-        // Define the block range (you can adjust this)
-        // For production, you'd store the last checked block and only fetch new events
-        const fromBlock = 0n; // Start from contract deployment block
-        const toBlock = "latest";
+        // Get the current block number
+        const latestBlock = await publicClient.getBlockNumber();
+        console.log("Latest block:", latestBlock);
 
-        // Fetch ItemListed events
+        // For MVP, let's just scan the last 100,000 blocks (adjust as needed)
+        // In production, you'd store the last scanned block and only fetch new ones
+        const blocksToScan = 9n;
+        const fromBlock = latestBlock > blocksToScan ? latestBlock - blocksToScan : 0n;
+        const toBlock = latestBlock;
+
+        console.log(`Scanning from block ${fromBlock} to ${toBlock}`);
+
+        // Define event ABIs
+        const itemListedEvent = parseAbiItem(
+            "event ItemListed(address indexed seller, address indexed nftAddress, uint256 indexed tokenId, uint256 price)",
+        );
+        const itemCanceledEvent = parseAbiItem(
+            "event ItemCanceled(address indexed seller, address indexed nftAddress, uint256 indexed tokenId)",
+        );
+        const itemBoughtEvent = parseAbiItem(
+            "event ItemBought(address indexed buyer, address indexed nftAddress, uint256 indexed tokenId, uint256 price)",
+        );
+
+        // Fetch ItemListed events in chunks
         console.log("📋 Fetching ItemListed events...");
-        const listedEvents = await publicClient.getLogs({
-            address: MARKETPLACE_CONTRACT_ADDRESS,
-            event: parseAbiItem(
-                "event ItemListed(address indexed seller, address indexed nftAddress, uint256 indexed tokenId, uint256 price)",
-            ),
-            fromBlock,
-            toBlock,
-        });
+        const listedEvents = await fetchEventsInChunks(itemListedEvent, fromBlock, toBlock);
         console.log(`✅ Found ${listedEvents.length} ItemListed events`);
 
-        // Fetch ItemCanceled events
+        // Fetch ItemCanceled events in chunks
         console.log("❌ Fetching ItemCanceled events...");
-        const canceledEvents = await publicClient.getLogs({
-            address: MARKETPLACE_CONTRACT_ADDRESS,
-            event: parseAbiItem(
-                "event ItemCanceled(address indexed seller, address indexed nftAddress, uint256 indexed tokenId)",
-            ),
-            fromBlock,
-            toBlock,
-        });
+        const canceledEvents = await fetchEventsInChunks(itemCanceledEvent, fromBlock, toBlock);
         console.log(`✅ Found ${canceledEvents.length} ItemCanceled events`);
 
-        // Fetch ItemBought events
+        // Fetch ItemBought events in chunks
         console.log("💰 Fetching ItemBought events...");
-        const boughtEvents = await publicClient.getLogs({
-            address: MARKETPLACE_CONTRACT_ADDRESS,
-            event: parseAbiItem(
-                "event ItemBought(address indexed buyer, address indexed nftAddress, uint256 indexed tokenId, uint256 price)",
-            ),
-            fromBlock,
-            toBlock,
-        });
+        const boughtEvents = await fetchEventsInChunks(itemBoughtEvent, fromBlock, toBlock);
         console.log(`✅ Found ${boughtEvents.length} ItemBought events`);
 
         // Build a map of active listings
@@ -118,5 +160,5 @@ export const watchListingEvents = (callback) => {
         },
     });
 
-    return unwatch;
+    return unwatch; // Call this function to stop watching
 };
