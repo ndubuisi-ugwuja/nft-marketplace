@@ -2,117 +2,78 @@
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { alchemyAPI } from "../lib/alchemy";
+import { getActiveListings } from "../lib/eventListener";
 import NFTCard from "../components/NFTCard";
 
 export default function MarketplacePage() {
     const [nfts, setNfts] = useState([]);
     const [loading, setLoading] = useState(false);
-    const { address, isConnected } = useAccount();
+    const { isConnected } = useAccount();
 
     useEffect(() => {
         if (isConnected) {
             loadMarketplace();
         }
-    }, [isConnected, address]);
+    }, [isConnected]);
 
     const loadMarketplace = async () => {
         setLoading(true);
         try {
-            // Strategy: Load NFTs from multiple sources
-            const allNFTs = [];
+            console.log("🏪 Loading marketplace...");
 
-            // 1. Load from current user's wallet
-            if (address) {
-                const userNFTs = await alchemyAPI.getNFTsForOwner(address);
-                allNFTs.push(...userNFTs);
+            // Get all active listings from blockchain events
+            const listings = await getActiveListings();
+            console.log(`📋 Found ${listings.length} active listings`);
+
+            if (listings.length === 0) {
+                setNfts([]);
+                setLoading(false);
+                return;
             }
 
-            // 2. Load from known NFT collections (add your NFT collection addresses here)
-            const knownCollections = [
-                "0xabca0c24838520b94ad7b3903b95e2aa17962e0f", // Your Cpunk collection
-                // Add more collection addresses here
-            ];
+            // Fetch metadata for each listing from Alchemy
+            console.log("📦 Fetching NFT metadata...");
+            const nftsWithMetadata = await Promise.all(
+                listings.map(async (listing) => {
+                    try {
+                        console.log(`Fetching metadata for ${listing.nftContract} #${listing.tokenId}`);
 
-            // Get holders of these collections
-            for (const collection of knownCollections) {
-                try {
-                    // Note: This is a simplified approach
-                    // In production, you'd use The Graph or event indexing
-                    const contractMetadata = await alchemyAPI.getContractMetadata(collection);
-                    console.log("Collection metadata:", contractMetadata);
+                        const metadata = await alchemyAPI.getNFTMetadata(listing.nftContract, listing.tokenId);
 
-                    // For now, we'll just add NFTs from known addresses
-                    // You can add specific wallet addresses you know have NFTs
-                    const knownHolders = [
-                        address, // Current user
-                        "0xF13be5175D1ae0093445bd7b08082BC2F75195b3", // Add your wallet
-                        // Add more wallet addresses of users who have listed NFTs
-                    ];
-
-                    for (const holder of knownHolders) {
-                        if (holder) {
-                            const holderNFTs = await alchemyAPI.getNFTsForOwner(holder);
-                            const collectionNFTs = holderNFTs.filter(
-                                (nft) => nft.contract.address.toLowerCase() === collection.toLowerCase(),
-                            );
-                            allNFTs.push(...collectionNFTs);
-                        }
+                        return {
+                            contract: { address: listing.nftContract },
+                            tokenId: listing.tokenId,
+                            name: metadata?.title || metadata?.name || `NFT #${listing.tokenId}`,
+                            description: metadata?.description || "No description",
+                            image: metadata?.media?.[0]?.gateway || metadata?.image,
+                            attributes: metadata?.metadata?.attributes || metadata?.attributes || [],
+                            price: listing.price,
+                            seller: listing.seller,
+                        };
+                    } catch (error) {
+                        console.error(`Error fetching metadata for ${listing.nftContract} #${listing.tokenId}:`, error);
+                        // Return listing without full metadata
+                        return {
+                            contract: { address: listing.nftContract },
+                            tokenId: listing.tokenId,
+                            name: `NFT #${listing.tokenId}`,
+                            description: "Metadata unavailable",
+                            image: null,
+                            attributes: [],
+                            price: listing.price,
+                            seller: listing.seller,
+                        };
                     }
-                } catch (error) {
-                    console.error(`Error loading collection ${collection}:`, error);
-                }
-            }
-
-            // Remove duplicates based on contract address + tokenId
-            const uniqueNFTs = Array.from(
-                new Map(
-                    allNFTs.map((nft) => {
-                        const key = `${nft.contract.address}-${nft.id?.tokenId || nft.tokenId}`;
-                        return [key, nft];
-                    }),
-                ).values(),
+                }),
             );
 
-            console.log("Total unique NFTs found:", uniqueNFTs.length);
+            // Filter out null results
+            const validNfts = nftsWithMetadata.filter((nft) => nft !== null);
+            console.log(`✅ Successfully loaded ${validNfts.length} NFTs`);
 
-            // Normalize NFT structure
-            const normalizedNFTs = uniqueNFTs.map((nft) => {
-                let tokenId;
-                if (nft.tokenId) {
-                    tokenId = nft.tokenId;
-                } else if (nft.id?.tokenId) {
-                    tokenId = parseInt(nft.id.tokenId, 16).toString();
-                }
-
-                return {
-                    contract: { address: nft.contract.address },
-                    tokenId: tokenId,
-                    title: nft.title,
-                    description: nft.description,
-                    media: nft.media,
-                    metadata: nft.metadata,
-                };
-            });
-
-            // Filter valid NFTs
-            const validNFTs = normalizedNFTs.filter((nft) => {
-                return nft.tokenId !== undefined && nft.tokenId !== null && nft.contract?.address;
-            });
-
-            // Format with metadata
-            const nftsWithMetadata = validNFTs.map((nft) => ({
-                contract: nft.contract,
-                tokenId: nft.tokenId,
-                name: nft.title || nft.metadata?.name || `NFT #${nft.tokenId}`,
-                description: nft.description || nft.metadata?.description || "No description",
-                image: nft.media?.[0]?.gateway || nft.metadata?.image,
-                attributes: nft.metadata?.attributes || [],
-            }));
-
-            console.log("Final NFTs to display:", nftsWithMetadata);
-            setNfts(nftsWithMetadata);
+            setNfts(validNfts);
         } catch (error) {
-            console.error("Error loading marketplace:", error);
+            console.error("❌ Error loading marketplace:", error);
         }
         setLoading(false);
     };
@@ -124,7 +85,7 @@ export default function MarketplacePage() {
                     <img src="/eth-logo.png" width={75} alt="eth-logo" />
                 </div>
                 <h2 className="text-2xl mb-4">Welcome to NFT Marketplace</h2>
-                <p className="text-gray-600 mb-6">Please connect your wallet to start browsing and trading NFTs</p>
+                <p className="text-gray-600 mb-6">Connect your wallet to start browsing and trading NFTs</p>
                 <div className="flex justify-center space-x-6 text-sm text-gray-500">
                     <div className="flex items-center space-x-2">
                         <span>✅ Buy NFTs</span>
@@ -144,7 +105,8 @@ export default function MarketplacePage() {
         return (
             <div className="text-center py-20">
                 <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-gray-700 mb-4"></div>
-                <p className="text-gray-600 text-lg">Loading marketplace...</p>
+                <p className="text-gray-600 text-lg">Scanning blockchain for listings...</p>
+                <p className="text-sm text-gray-500 mt-2">This may take a few seconds</p>
             </div>
         );
     }
@@ -153,19 +115,22 @@ export default function MarketplacePage() {
         <div>
             <div className="mb-8">
                 <h1 className="text-2xl mb-2">🏪 Marketplace</h1>
-                <p className="text-gray-600">Browse NFTs listed for sale ({nfts.length} total)</p>
+                <p className="text-gray-600">
+                    {nfts.length > 0
+                        ? `Showing ${nfts.length} NFT${nfts.length !== 1 ? "s" : ""} listed for sale`
+                        : "Browse NFTs listed for sale"}
+                </p>
             </div>
 
             {nfts.length === 0 ? (
                 <div className="text-center py-20 bg-white rounded-lg shadow">
                     <div className="text-6xl mb-4">📦</div>
-                    <p className="text-gray-600 text-lg mb-2">No NFTs found</p>
-                    <p className="text-sm text-gray-500 mb-6">Listed NFTs from known collections will appear here</p>
+                    <p className="text-gray-600 text-lg mb-2">No NFTs listed for sale yet</p>
+                    <p className="text-sm text-gray-500 mb-6">Be the first to list an NFT on the marketplace!</p>
 
                     <a
                         href="/my-nfts"
-                        className="inline-block bg-gray-700 text-white px-6 py-3 rounded-lg
-                    hover:bg-gray-600 font-semibold"
+                        className="inline-block bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-semibold"
                     >
                         List Your NFT
                     </a>
