@@ -155,7 +155,7 @@ export default function ListingCard({ nft, contractAddress, tokenId, onSuccess }
                                     disabled={isPending || isConfirming}
                                     className="bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 font-medium transition"
                                 >
-                                    {isPending || isConfirming ? "Canceling..." : "Cancel listing"}
+                                    {isPending || isConfirming ? "Canceling..." : "Cancel Listing"}
                                 </button>
                             </div>
                         </>
