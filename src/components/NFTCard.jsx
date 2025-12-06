@@ -7,7 +7,7 @@ import { resolveIPFS } from "../lib/alchemy";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-export default function NFTCard({ nft, contractAddress, tokenId, onSuccess }) {
+export default function NFTCard({ nft, contractAddress, tokenId }) {
     const { address } = useAccount();
     const router = useRouter();
 
