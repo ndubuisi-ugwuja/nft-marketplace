@@ -23,6 +23,7 @@
         "wagmi": "^2.19.4"
     },
     "devDependencies": {
+        "@graphprotocol/graph-ts": "^0.38.2",
         "@tailwindcss/postcss": "^4",
         "baseline-browser-mapping": "^2.9.2",
         "prettier": "^3.6.2",
