@@ -304,9 +304,7 @@ export default function SellPage() {
                         {currentStep === 2 && !isApproved && (
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                 <p className="text-sm text-blue-800 mb-2 font-semibold">
-                                    {isApprovePending || isApproveConfirming
-                                        ? "⏳ Approving NFT..."
-                                        : "✅ Approval Required"}
+                                    {isApprovePending || isApproveConfirming ? "Approving NFT..." : "Approval Required"}
                                 </p>
                                 <p className="text-xs text-gray-700">
                                     {isApprovePending || isApproveConfirming

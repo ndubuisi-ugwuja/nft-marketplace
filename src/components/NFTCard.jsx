@@ -1,13 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useWriteContract, useWaitForTransactionReceipt, useContractEvent, useAccount } from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { formatEther } from "viem";
 import { MARKETPLACE_ABI, MARKETPLACE_CONTRACT_ADDRESS } from "../lib/marketplace";
 import { resolveIPFS } from "../lib/alchemy";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function NFTCard({ nft, contractAddress, tokenId, onSuccess }) {
     const { address } = useAccount();
+    const router = useRouter();
 
     // Use listing data from props if available (from event listener)
     const [listing, setListing] = useState(nft.price && nft.seller ? { price: nft.price, seller: nft.seller } : null);
@@ -36,8 +38,11 @@ export default function NFTCard({ nft, contractAddress, tokenId, onSuccess }) {
         if (isSuccess) {
             toast.success("NFT purchased successfully!");
             onSuccess?.();
+            setTimeout(() => {
+                router.push("/my-nfts");
+            }, 2000);
         }
-    }, [isSuccess]);
+    }, [isSuccess, router]);
 
     // Don't render if no listing
     if (!listing) return null;

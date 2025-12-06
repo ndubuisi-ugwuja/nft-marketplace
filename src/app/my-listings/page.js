@@ -139,7 +139,7 @@ export default function MyListingsPage() {
                                 disabled={isPending || isConfirming}
                                 className="w-full bg-gray-200 text-green-600 py-3 rounded-lg hover:bg-white disabled:opacity-50 font-semibold transition"
                             >
-                                {isPending || isConfirming ? "⏳ Withdrawing..." : "💸 Withdraw Now"}
+                                {isPending || isConfirming ? "Withdrawing..." : "💸 Withdraw Now"}
                             </button>
                         </div>
                     )}
