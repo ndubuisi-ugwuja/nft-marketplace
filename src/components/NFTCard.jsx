@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useWriteContract, useWaitForTransactionReceipt, useAccount, useReadContract } from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { formatEther } from "viem";
 import { MARKETPLACE_ABI, MARKETPLACE_CONTRACT_ADDRESS } from "../lib/marketplace";
 import { resolveIPFS } from "../lib/alchemy";
@@ -8,46 +8,15 @@ import toast from "react-hot-toast";
 
 export default function NFTCard({ nft, contractAddress, tokenId, onSuccess }) {
     const { address } = useAccount();
-    const [listing, setListing] = useState(null);
 
-    // Validate inputs before making contract call
-    const isValid = contractAddress && tokenId !== undefined && tokenId !== null;
-
-    // Read listing from contract - only if we have valid data
-    const { data: listingData, refetch } = useReadContract({
-        address: MARKETPLACE_CONTRACT_ADDRESS,
-        abi: MARKETPLACE_ABI,
-        functionName: "getListing",
-        args: isValid ? [contractAddress, BigInt(tokenId)] : undefined,
-        enabled: isValid, // Only run query if data is valid
-    });
-
-    useEffect(() => {
-        if (listingData) {
-            // Handle both array format [price, seller] and object format {price, seller}
-            let price, seller;
-
-            if (Array.isArray(listingData)) {
-                price = listingData[0];
-                seller = listingData[1];
-            } else {
-                price = listingData.price;
-                seller = listingData.seller;
-            }
-
-            if (price && price > 0n) {
-                setListing({ price, seller });
-            } else {
-                setListing(null);
-            }
-        }
-    }, [listingData]);
+    // Use listing data from props if available (from event listener)
+    const [listing, setListing] = useState(nft.price && nft.seller ? { price: nft.price, seller: nft.seller } : null);
 
     const { data: hash, writeContract, isPending } = useWriteContract();
     const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
     const handleBuy = async () => {
-        if (!listing || !isValid) return;
+        if (!listing) return;
 
         try {
             writeContract({
@@ -66,16 +35,15 @@ export default function NFTCard({ nft, contractAddress, tokenId, onSuccess }) {
     useEffect(() => {
         if (isSuccess) {
             toast.success("NFT purchased successfully!");
-            refetch();
             onSuccess?.();
         }
     }, [isSuccess]);
 
-    // Don't render if invalid data or not listed
-    if (!isValid || !listing) return null;
+    // Don't render if no listing
+    if (!listing) return null;
 
     const isOwner = address?.toLowerCase() === listing.seller?.toLowerCase();
-    const imageUrl = resolveIPFS(nft?.image || nft?.media?.[0]?.gateway);
+    const imageUrl = resolveIPFS(nft?.image);
 
     return (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all">
@@ -104,7 +72,7 @@ export default function NFTCard({ nft, contractAddress, tokenId, onSuccess }) {
                 <div className="border-t pt-3 mt-3">
                     <div className="flex justify-between items-center mb-3">
                         <span className="text-sm text-gray-500">Price</span>
-                        <span className="text-xl font-bold text-blue-600">{formatEther(listing.price)} ETH</span>
+                        <span className="text-xl font-bold text-gray-700">{formatEther(listing.price)} ETH</span>
                     </div>
                     <p className="text-xs text-gray-500 mb-3">
                         Seller: {listing.seller.slice(0, 6)}...{listing.seller.slice(-4)}
@@ -114,7 +82,7 @@ export default function NFTCard({ nft, contractAddress, tokenId, onSuccess }) {
                         <button
                             onClick={handleBuy}
                             disabled={isPending || isConfirming}
-                            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition"
+                            className="w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition"
                         >
                             {isPending || isConfirming ? "⏳ Processing..." : "💰 Buy Now"}
                         </button>
