@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { alchemyAPI } from "../lib/alchemy";
-import { getActiveListings } from "../lib/eventListener";
 import NFTCard from "../components/NFTCard";
 
 export default function MarketplacePage() {

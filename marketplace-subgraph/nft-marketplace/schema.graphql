@@ -1,40 +1,40 @@
-type ItemBought @entity(immutable: true) {
-  id: Bytes!
-  buyer: Bytes! # address
-  nftAddress: Bytes! # address
-  tokenId: BigInt! # uint256
-  price: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+type Listing @entity(immutable: false) {
+    id: ID!
+    nftContract: Bytes!
+    tokenId: BigInt!
+    price: BigInt!
+    seller: Bytes!
+    active: Boolean!
+    buyer: Bytes
+    timestamp: BigInt!
+    blockNumber: BigInt!
 }
 
-type ItemCanceled @entity(immutable: true) {
-  id: Bytes!
-  seller: Bytes! # address
-  nftAddress: Bytes! # address
-  tokenId: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+type ItemListedEvent @entity(immutable: true) {
+    id: ID!
+    seller: Bytes!
+    nftAddress: Bytes!
+    tokenId: BigInt!
+    price: BigInt!
+    timestamp: BigInt!
+    blockNumber: BigInt!
 }
 
-type ItemListed @entity(immutable: true) {
-  id: Bytes!
-  seller: Bytes! # address
-  nftAddress: Bytes! # address
-  tokenId: BigInt! # uint256
-  price: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+type ItemBoughtEvent @entity(immutable: true) {
+    id: ID!
+    buyer: Bytes!
+    nftAddress: Bytes!
+    tokenId: BigInt!
+    price: BigInt!
+    timestamp: BigInt!
+    blockNumber: BigInt!
 }
 
-type ProceedsWithdrawn @entity(immutable: true) {
-  id: Bytes!
-  seller: Bytes! # address
-  amount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+type ItemCanceledEvent @entity(immutable: true) {
+    id: ID!
+    seller: Bytes!
+    nftAddress: Bytes!
+    tokenId: BigInt!
+    timestamp: BigInt!
+    blockNumber: BigInt!
 }
