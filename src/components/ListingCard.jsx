@@ -148,14 +148,14 @@ export default function ListingCard({ nft, contractAddress, tokenId, onSuccess }
                                     onClick={() => setIsEditing(true)}
                                     className="bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 font-medium transition"
                                 >
-                                    ✏️ Update
+                                    Update Price
                                 </button>
                                 <button
                                     onClick={handleCancel}
                                     disabled={isPending || isConfirming}
-                                    className="bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 font-medium transition"
+                                    className="bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 font-medium transition"
                                 >
-                                    {isPending || isConfirming ? "⏳" : "❌ Cancel"}
+                                    {isPending || isConfirming ? "Canceling..." : "Cancel listing"}
                                 </button>
                             </div>
                         </>
@@ -175,15 +175,15 @@ export default function ListingCard({ nft, contractAddress, tokenId, onSuccess }
                                 <button
                                     onClick={handleUpdatePrice}
                                     disabled={isPending || isConfirming}
-                                    className="bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 font-medium transition"
+                                    className="bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 disabled:opacity-50 font-medium transition"
                                 >
-                                    {isPending || isConfirming ? "⏳" : "✅ Save"}
+                                    {isPending || isConfirming ? "Saving..." : "Save"}
                                 </button>
                                 <button
                                     onClick={() => setIsEditing(false)}
-                                    className="bg-gray-400 text-white py-2 rounded-lg hover:bg-gray-500 font-medium transition"
+                                    className="bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-400 font-medium transition"
                                 >
-                                    ❌ Cancel
+                                    Cancel
                                 </button>
                             </div>
                         </>

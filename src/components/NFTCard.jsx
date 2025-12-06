@@ -84,7 +84,7 @@ export default function NFTCard({ nft, contractAddress, tokenId, onSuccess }) {
                             disabled={isPending || isConfirming}
                             className="w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition"
                         >
-                            {isPending || isConfirming ? "⏳ Processing..." : "💰 Buy Now"}
+                            {isPending || isConfirming ? "Processing..." : "Buy Now"}
                         </button>
                     ) : (
                         <div className="bg-gray-100 text-center py-3 rounded-lg text-sm text-gray-600 font-medium">

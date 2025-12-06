@@ -115,7 +115,6 @@ export default function MyNFTsPage() {
 
             {nfts.length === 0 ? (
                 <div className="text-center py-20 bg-white rounded-lg shadow">
-                    <div className="text-6xl mb-4">📭</div>
                     <p className="text-gray-600 text-lg mb-2">No NFTs found in your wallet</p>
                     <p className="text-sm text-gray-500">NFTs you own will appear here</p>
                 </div>

@@ -114,7 +114,7 @@ export default function MyListingsPage() {
             <div className="text-center py-20">
                 <div className="text-6xl mb-4">🔌</div>
                 <h2 className="text-2xl font-bold mb-4">Connect your wallet</h2>
-                <p className="text-gray-600">Connect to view your listings</p>
+                <p className="text-gray-600">Connect your wallet to view your listings</p>
             </div>
         );
     }
@@ -153,7 +153,6 @@ export default function MyListingsPage() {
                 </div>
             ) : myListings.length === 0 ? (
                 <div className="text-center py-20 bg-white rounded-lg shadow">
-                    <div className="text-6xl mb-4">📝</div>
                     <p className="text-gray-600 text-lg mb-2">You have no NFTs to list</p>
                     <p className="text-sm text-gray-500 mb-6">Listed NFTs will appear here</p>
                     <a

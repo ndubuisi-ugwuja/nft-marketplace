@@ -274,7 +274,6 @@ export default function SellPage() {
                                         placeholder="0.1"
                                         className="w-full border-2 border-gray-300 rounded-lg p-3 text-lg focus:border-gray-700 outline-none"
                                     />
-                                    <p className="text-xs text-gray-500 mt-2">Minimum: 0.001 ETH</p>
                                 </>
                             ) : (
                                 <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-between">
@@ -298,7 +297,7 @@ export default function SellPage() {
                                 disabled={!price || parseFloat(price) <= 0}
                                 className="w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg"
                             >
-                                Next: Approve NFT
+                                Approve NFT
                             </button>
                         )}
 
@@ -327,7 +326,7 @@ export default function SellPage() {
                                     disabled={!price || parseFloat(price) <= 0 || isListPending || isListConfirming}
                                     className="w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg"
                                 >
-                                    {isListPending || isListConfirming ? "⏳ Listing NFT..." : "🚀 List NFT for Sale"}
+                                    {isListPending || isListConfirming ? "Listing NFT..." : "List for Sale"}
                                 </button>
                                 <p className="text-sm text-green-600 mt-3 flex items-center">
                                     <span className="mr-2">✅</span>
