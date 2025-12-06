@@ -15,7 +15,12 @@ export default function ListingCard({ nft, contractAddress, tokenId, onSuccess }
     const isValid = contractAddress && tokenId !== undefined && tokenId !== null;
 
     // Read listing from contract
-    const { data: listingData, refetch } = useReadContract({
+    const {
+        data: listingData,
+        refetch,
+        isLoading,
+        error,
+    } = useReadContract({
         address: MARKETPLACE_CONTRACT_ADDRESS,
         abi: MARKETPLACE_ABI,
         functionName: "getListing",
@@ -24,11 +29,34 @@ export default function ListingCard({ nft, contractAddress, tokenId, onSuccess }
     });
 
     useEffect(() => {
-        if (listingData && listingData.price > 0n) {
-            setListing({
-                price: listingData.price,
-                seller: listingData.seller,
-            });
+        if (listingData) {
+            console.log("Raw listing data:", listingData);
+
+            // Handle both array format [price, seller] and object format {price, seller}
+            let price, seller;
+
+            if (Array.isArray(listingData)) {
+                // Array format: [price, seller]
+                price = listingData[0];
+                seller = listingData[1];
+            } else {
+                // Object format: {price, seller}
+                price = listingData.price;
+                seller = listingData.seller;
+            }
+
+            console.log("Parsed - Price:", price?.toString(), "Seller:", seller);
+
+            if (price && price > 0n) {
+                setListing({
+                    price: price,
+                    seller: seller,
+                });
+                console.log("✅ NFT is listed for sale");
+            } else {
+                setListing(null);
+                console.log("❌ NFT is NOT listed (price is 0)");
+            }
         }
     }, [listingData]);
 
@@ -72,7 +100,23 @@ export default function ListingCard({ nft, contractAddress, tokenId, onSuccess }
         }
     }, [isSuccess]);
 
-    if (!isValid || !listing) return null;
+    // Show loading state while checking listing
+    if (isLoading) {
+        return (
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden p-4">
+                <div className="animate-pulse">
+                    <div className="bg-gray-300 h-64 w-full mb-4 rounded"></div>
+                    <div className="bg-gray-300 h-4 w-3/4 mb-2 rounded"></div>
+                    <div className="bg-gray-300 h-4 w-1/2 rounded"></div>
+                </div>
+            </div>
+        );
+    }
+
+    // Don't render if not valid or not listed
+    if (!isValid || !listing) {
+        return null;
+    }
 
     const imageUrl = resolveIPFS(nft?.image || nft?.media?.[0]?.gateway);
 
@@ -88,27 +132,28 @@ export default function ListingCard({ nft, contractAddress, tokenId, onSuccess }
             />
             <div className="p-4">
                 <h3 className="font-bold text-lg mb-2 truncate">{nft?.name || `NFT #${tokenId}`}</h3>
+                <p className="text-xs text-gray-500 mb-2">Token ID: {tokenId}</p>
 
                 <div className="border-t pt-3 mt-3">
                     {!isEditing ? (
                         <>
                             <div className="flex justify-between items-center mb-4">
                                 <span className="text-sm text-gray-500">Current Price</span>
-                                <span className="text-xl font-bold text-blue-600">
+                                <span className="text-xl font-bold text-gray-700">
                                     {formatEther(listing.price)} ETH
                                 </span>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <button
                                     onClick={() => setIsEditing(true)}
-                                    className="bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 font-medium"
+                                    className="bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 font-medium transition"
                                 >
                                     ✏️ Update
                                 </button>
                                 <button
                                     onClick={handleCancel}
                                     disabled={isPending || isConfirming}
-                                    className="bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 font-medium"
+                                    className="bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 font-medium transition"
                                 >
                                     {isPending || isConfirming ? "⏳" : "❌ Cancel"}
                                 </button>
@@ -120,22 +165,23 @@ export default function ListingCard({ nft, contractAddress, tokenId, onSuccess }
                             <input
                                 type="number"
                                 step="0.001"
+                                min="0"
                                 value={newPrice}
                                 onChange={(e) => setNewPrice(e.target.value)}
                                 placeholder={formatEther(listing.price)}
-                                className="w-full border-2 rounded-lg p-3 mb-3 focus:border-blue-500 outline-none"
+                                className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 focus:border-gray-700 outline-none"
                             />
                             <div className="grid grid-cols-2 gap-2">
                                 <button
                                     onClick={handleUpdatePrice}
                                     disabled={isPending || isConfirming}
-                                    className="bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 font-medium"
+                                    className="bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 font-medium transition"
                                 >
                                     {isPending || isConfirming ? "⏳" : "✅ Save"}
                                 </button>
                                 <button
                                     onClick={() => setIsEditing(false)}
-                                    className="bg-gray-400 text-white py-2 rounded-lg hover:bg-gray-500 font-medium"
+                                    className="bg-gray-400 text-white py-2 rounded-lg hover:bg-gray-500 font-medium transition"
                                 >
                                     ❌ Cancel
                                 </button>

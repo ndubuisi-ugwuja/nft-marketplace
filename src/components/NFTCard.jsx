@@ -23,13 +23,23 @@ export default function NFTCard({ nft, contractAddress, tokenId, onSuccess }) {
     });
 
     useEffect(() => {
-        if (listingData && listingData.price > 0n) {
-            setListing({
-                price: listingData.price,
-                seller: listingData.seller,
-            });
-        } else {
-            setListing(null);
+        if (listingData) {
+            // Handle both array format [price, seller] and object format {price, seller}
+            let price, seller;
+
+            if (Array.isArray(listingData)) {
+                price = listingData[0];
+                seller = listingData[1];
+            } else {
+                price = listingData.price;
+                seller = listingData.seller;
+            }
+
+            if (price && price > 0n) {
+                setListing({ price, seller });
+            } else {
+                setListing(null);
+            }
         }
     }, [listingData]);
 

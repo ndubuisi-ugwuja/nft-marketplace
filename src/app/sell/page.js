@@ -174,9 +174,13 @@ export default function SellPage() {
                 <div className="text-6xl mb-4">⚠️</div>
                 <h2 className="text-2xl font-bold mb-4">No NFT Selected</h2>
                 <p className="text-gray-600 mb-6">Please select an NFT from "My NFTs" to list</p>
-                href="/my-nfts" className="inline-block bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-600
+                <a
+                    href="/my-nfts"
+                    className="inline-block bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-600
                 font-semibold"
-                <a>Go to My NFTs</a>
+                >
+                    Go to My NFTs
+                </a>
             </div>
         );
     }

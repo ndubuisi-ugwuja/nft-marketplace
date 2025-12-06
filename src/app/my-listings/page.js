@@ -156,9 +156,13 @@ export default function MyListingsPage() {
                     <div className="text-6xl mb-4">📝</div>
                     <p className="text-gray-600 text-lg mb-2">You have no NFTs to list</p>
                     <p className="text-sm text-gray-500 mb-6">Listed NFTs will appear here</p>
-                    href="/my-nfts" className="inline-block bg-gray-700 text-white px-6 py-3 rounded-lg
+                    <a
+                        href="/my-nfts"
+                        className="inline-block bg-gray-700 text-white px-6 py-3 rounded-lg
                     hover:bg-gray-600 font-semibold"
-                    <a>View My NFTs</a>
+                    >
+                        View My NFTs
+                    </a>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
