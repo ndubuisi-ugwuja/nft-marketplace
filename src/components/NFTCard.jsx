@@ -88,7 +88,7 @@ export default function NFTCard({ nft, contractAddress, tokenId, onSuccess }) {
                         </button>
                     ) : (
                         <div className="bg-gray-100 text-center py-3 rounded-lg text-sm text-gray-600 font-medium">
-                            🏷️ Your Listing
+                            You own this NFT
                         </div>
                     )}
                 </div>

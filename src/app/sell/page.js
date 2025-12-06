@@ -336,7 +336,7 @@ export default function SellPage() {
                                     onClick={handleEditPrice}
                                     className="w-full mt-2 text-sm text-gray-700 hover:underline"
                                 >
-                                    Change Price
+                                    Edit Price
                                 </button>
                             </>
                         )}

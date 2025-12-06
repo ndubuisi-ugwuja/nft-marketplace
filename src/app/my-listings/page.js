@@ -137,7 +137,7 @@ export default function MyListingsPage() {
                             <button
                                 onClick={handleWithdraw}
                                 disabled={isPending || isConfirming}
-                                className="w-full bg-white text-green-600 py-3 rounded-lg hover:bg-gray-100 disabled:opacity-50 font-semibold transition"
+                                className="w-full bg-gray-200 text-green-600 py-3 rounded-lg hover:bg-white disabled:opacity-50 font-semibold transition"
                             >
                                 {isPending || isConfirming ? "⏳ Withdrawing..." : "💸 Withdraw Now"}
                             </button>
