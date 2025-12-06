@@ -37,7 +37,6 @@ export default function NFTCard({ nft, contractAddress, tokenId, onSuccess }) {
     useEffect(() => {
         if (isSuccess) {
             toast.success("NFT purchased successfully!");
-            onSuccess?.();
             setTimeout(() => {
                 router.push("/my-nfts");
             }, 2000);
