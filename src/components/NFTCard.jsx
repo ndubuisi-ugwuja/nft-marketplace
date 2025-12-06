@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt, useContractEvent, useAccount } from "wagmi";
 import { formatEther } from "viem";
 import { MARKETPLACE_ABI, MARKETPLACE_CONTRACT_ADDRESS } from "../lib/marketplace";
 import { resolveIPFS } from "../lib/alchemy";
