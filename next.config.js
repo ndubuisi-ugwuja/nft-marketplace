@@ -1,9 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Force webpack by setting turbopack to false
-    turbo: false,
+    // Empty turbopack config to acknowledge it exists
+    turbopack: {},
 
-    serverExternalPackages: ["pino", "pino-pretty"],
+    // Tell Next.js to use webpack
+    experimental: {
+        forceSwcTransforms: true,
+    },
+
+    serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
 
     webpack: (config, { isServer }) => {
         // Externalize problematic server-side packages
