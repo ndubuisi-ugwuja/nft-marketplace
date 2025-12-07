@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { parseEther } from "viem";
@@ -8,7 +8,8 @@ import { MARKETPLACE_ABI, MARKETPLACE_CONTRACT_ADDRESS } from "../../lib/marketp
 import { resolveIPFS } from "../../lib/alchemy";
 import toast from "react-hot-toast";
 
-export default function SellPage() {
+// Separate the component that uses useSearchParams
+function SellPageContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { address } = useAccount();
@@ -49,11 +50,10 @@ export default function SellPage() {
         if (isApproveSuccess) {
             console.log("✅ Approval successful!");
             toast.success("NFT approved! Now you can list it.");
-            // Refetch approval status to ensure it's updated
             refetchApproval();
             setCurrentStep(3);
         }
-    }, [isApproveSuccess]);
+    }, [isApproveSuccess, refetchApproval]);
 
     // Handle approval error
     useEffect(() => {
@@ -82,7 +82,7 @@ export default function SellPage() {
         }
     }, [isListSuccess, router]);
 
-    // Auto-advance to step 3 if already approved (e.g., coming back to page)
+    // Auto-advance to step 3 if already approved
     useEffect(() => {
         if (isApproved && currentStep === 1 && price) {
             console.log("ℹ️ NFT already approved, auto-advancing to step 3");
@@ -111,7 +111,6 @@ export default function SellPage() {
         console.log("Token ID:", tokenId);
         console.log("Marketplace:", MARKETPLACE_CONTRACT_ADDRESS);
 
-        // Validation checks
         if (!price || parseFloat(price) <= 0) {
             console.error("❌ Invalid price");
             toast.error("Please enter a valid price");
@@ -176,8 +175,7 @@ export default function SellPage() {
                 <p className="text-gray-600 mb-6">Please select an NFT from "My NFTs" to list</p>
                 <a
                     href="/my-nfts"
-                    className="inline-block bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-600
-                font-semibold"
+                    className="inline-block bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-semibold"
                 >
                     Go to My NFTs
                 </a>
@@ -358,5 +356,21 @@ export default function SellPage() {
                 </ol>
             </div>
         </div>
+    );
+}
+
+// Main component with Suspense wrapper
+export default function SellPage() {
+    return (
+        <Suspense
+            fallback={
+                <div className="max-w-2xl mx-auto text-center py-20">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading...</p>
+                </div>
+            }
+        >
+            <SellPageContent />
+        </Suspense>
     );
 }
