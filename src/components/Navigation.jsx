@@ -6,10 +6,10 @@ export default function Navigation() {
     const pathname = usePathname();
 
     const links = [
-        { href: "/", label: "Marketplace" },
-        { href: "/my-nfts", label: "My NFTs" },
-        { href: "/my-listings", label: "My Listings" },
-        { href: "/sell", label: "Sell NFT" },
+        { href: "/", label: "MARKETPLACE" },
+        { href: "/my-nfts", label: "MY NFTs" },
+        { href: "/my-listings", label: "MY LISTINGS" },
+        { href: "/sell", label: "SELL NFT" },
     ];
 
     return (
@@ -20,10 +20,10 @@ export default function Navigation() {
                         <Link
                             key={link.href}
                             href={link.href}
-                            className={`px-6 py-4 transition font-medium ${
+                            className={`px-6 py-4 transition font-semibold text-sm ${
                                 pathname === link.href
                                     ? " text-black border-b-4 border-gray-600"
-                                    : "text-black hover:bg-gray-100 hover:text-gray-600"
+                                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-500"
                             }`}
                         >
                             {link.label}
