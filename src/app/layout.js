@@ -3,7 +3,7 @@ import Navigation from "../components/Navigation";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Link from "next/link";
-import Providers from "./Providers";
+import Providers from "./providers";
 
 export const metadata = {
     title: "NFT Marketplace - Buy & Sell Digital Art",
