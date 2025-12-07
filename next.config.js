@@ -1,17 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Empty turbopack config to silence the warning
-    turbopack: {},
+    // Force webpack by setting turbopack to false
+    turbo: false,
+
+    serverExternalPackages: ["pino", "pino-pretty"],
 
     webpack: (config, { isServer }) => {
-        config.externals.push("pino-pretty", "lokijs", "encoding");
+        // Externalize problematic server-side packages
+        if (isServer) {
+            config.externals.push("pino", "pino-pretty", "thread-stream");
+        }
 
+        // Resolve fallbacks for client-side
         if (!isServer) {
             config.resolve.fallback = {
                 ...config.resolve.fallback,
                 fs: false,
                 net: false,
                 tls: false,
+                crypto: false,
             };
         }
 
