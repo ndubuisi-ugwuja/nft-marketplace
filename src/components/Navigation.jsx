@@ -13,7 +13,7 @@ export default function Navigation() {
     ];
 
     return (
-        <div className="bg-gray-700 border-b border-gray-700">
+        <div className="border-b-2 border-gray-400">
             <div className="container mx-auto px-4">
                 <nav className="flex space-x-1">
                     {links.map((link) => (
@@ -22,8 +22,8 @@ export default function Navigation() {
                             href={link.href}
                             className={`px-6 py-4 transition font-medium ${
                                 pathname === link.href
-                                    ? " text-white border-b-2 border-blue-500"
-                                    : "text-gray-300 hover:bg-gray-600 hover:text-white"
+                                    ? " text-black border-b-4 border-gray-600"
+                                    : "text-black hover:bg-gray-100 hover:text-gray-600"
                             }`}
                         >
                             {link.label}

@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
                         <RainbowKitProvider
                             showRecentTransactions={true}
                             theme={darkTheme({
-                                accentColor: "#6B7280",
+                                accentColor: "#535353ff",
                                 accentColorForeground: "white",
                                 borderRadius: "medium",
                             })}
@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
                                 <div className="container mx-auto flex justify-between items-center">
                                     <Link href="/" className="flex items-center space-x-2">
                                         <img src="/nft-logo.png" width={60} alt="Nft-logo" />
-                                        <h1 className="text-xl">NFT Marketplace</h1>
+                                        <h1 className="text-xl relative right-[15px]">NFT Marketplace</h1>
                                     </Link>
                                     <ConnectButton />
                                 </div>
