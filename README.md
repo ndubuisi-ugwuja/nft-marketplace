@@ -151,6 +151,52 @@ event ProceedsWithdrawn(address indexed seller, uint256 amount)
 
 ---
 
+### Smart Contract Deployment
+
+If you want to deploy your own marketplace contract:
+
+### Compile Contracts
+
+```bash
+yarn hardhat compile
+```
+
+### Deploy to localhost
+
+```bash
+yarn hardhat ignition deploy ./ignition/modules/NftMarketplaceModule.js
+```
+
+### Deploy to Sepolia
+
+```bash
+yarn hardhat ignition deploy ./ignition/modules/NftMarketplaceModule.js --network sepolia
+```
+
+### Verify Contracts on Etherscan
+
+```bash
+yarn hardhat verify --network sepolia <CONTRACT_ADDRESS>
+```
+
+### Run Tests
+
+**Unit Tests (Local):**
+
+```bash
+yarn hardhat test
+```
+
+**Staging Tests (Sepolia):**
+
+```bash
+yarn hardhat test --network sepolia
+```
+
+Update `NEXT_PUBLIC_MARKETPLACE_ADDRESS` with your deployed contract address.
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
