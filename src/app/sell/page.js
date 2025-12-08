@@ -82,14 +82,6 @@ function SellPageContent() {
         }
     }, [isListSuccess, router]);
 
-    // Auto-advance to step 3 if already approved
-    useEffect(() => {
-        if (isApproved && currentStep === 1 && price) {
-            console.log("ℹ️ NFT already approved, auto-advancing to step 3");
-            setCurrentStep(3);
-        }
-    }, [isApproved, currentStep, price]);
-
     const handleApprove = () => {
         console.log("🔵 handleApprove called");
 
@@ -245,17 +237,14 @@ function SellPageContent() {
                     />
                     <div className="p-6">
                         <h2 className="text-2xl font-bold mb-4">{name || `NFT #${tokenId}`}</h2>
-
                         <div className="mb-6">
                             <p className="text-sm text-gray-500 mb-1">Contract</p>
                             <p className="text-xs font-mono bg-gray-100 p-2 rounded break-all">{contract}</p>
                         </div>
-
                         <div className="mb-6">
                             <p className="text-sm text-gray-500 mb-1">Token ID</p>
                             <p className="font-mono font-bold">{tokenId}</p>
                         </div>
-
                         {/* Price Input/Display */}
                         <div className="mb-6">
                             <label className="block text-sm font-medium mb-2">
@@ -287,18 +276,26 @@ function SellPageContent() {
                                 </div>
                             )}
                         </div>
-
                         {/* Action Buttons */}
-                        {currentStep === 1 && !isApproved && (
+                        {currentStep === 1 && (
                             <button
-                                onClick={handleApprove}
+                                onClick={() => {
+                                    if (!price || parseFloat(price) <= 0) {
+                                        toast.error("Please enter a valid price first");
+                                        return;
+                                    }
+                                    // If already approved, skip to step 3, otherwise go to step 2
+                                    setCurrentStep(isApproved ? 3 : 2);
+                                    if (!isApproved) {
+                                        approve();
+                                    }
+                                }}
                                 disabled={!price || parseFloat(price) <= 0}
                                 className="w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg"
                             >
-                                Approve NFT
+                                {isApproved ? "Continue to List" : "Approve NFT"}
                             </button>
                         )}
-
                         {currentStep === 2 && !isApproved && (
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                 <p className="text-sm text-blue-800 mb-2 font-semibold">
@@ -311,7 +308,6 @@ function SellPageContent() {
                                 </p>
                             </div>
                         )}
-
                         {showListButton && (
                             <>
                                 <button
