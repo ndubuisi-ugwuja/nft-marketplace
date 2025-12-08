@@ -80,7 +80,7 @@ The platform leverages **The Graph Protocol** for efficient blockchain data inde
 - **[Solidity ^0.8.28](https://soliditylang.org/)** - Smart contract language
 - **[Hardhat](https://hardhat.org/)** - Ethereum development environment
 - **[OpenZeppelin](https://www.openzeppelin.com/)** - Secure smart contract library
-- **[Ethers.js v5](https://docs.ethers.org/v5/)** - Ethereum library
+- **[Ethers.js](https://docs.ethers.org/v5/)** - Ethereum library
 - **[Sepolia Testnet](https://sepolia.etherscan.io/)** - Ethereum test network
 
 ### Blockchain Indexing
