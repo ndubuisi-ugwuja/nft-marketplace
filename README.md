@@ -57,7 +57,6 @@ The platform leverages **The Graph Protocol** for efficient blockchain data inde
 
 - 🔗 **Blockchain Events**: Smart contract events indexed by The Graph
 - 🔍 **GraphQL API**: Fast and flexible data queries
-- 🎯 **Type Safety**: Full TypeScript support
 - 🔄 **Auto-refresh**: Marketplace data updates automatically
 - 🛡️ **Security**: Reentrancy protection and secure contract patterns
 
