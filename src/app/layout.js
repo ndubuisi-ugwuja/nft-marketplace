@@ -3,7 +3,7 @@ import Navigation from "../components/Navigation";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Link from "next/link";
-import Providers from "./Providers";
+import Providers from "../components/Providers";
 
 export const metadata = {
     title: "NFT Marketplace - Buy & Sell Digital Art",
@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
                         <div className="container mx-auto flex justify-between items-center">
                             <Link href="/" className="flex items-center space-x-2">
                                 <img src="/nft-logo.png" width={60} alt="Nft-logo" />
-                                <h1 className="text-xl relative right-[15px]">NFT Marketplace</h1>
+                                <h1 className="text-xl relative right-[15px] hidden md:block">NFT Marketplace</h1>
                             </Link>
                             <ConnectButton />
                         </div>
