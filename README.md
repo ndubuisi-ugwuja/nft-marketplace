@@ -158,6 +158,7 @@ If you want to deploy your own marketplace contract:
 ### Compile Contracts
 
 ```bash
+cd smart-contracts
 yarn hardhat compile
 ```
 
