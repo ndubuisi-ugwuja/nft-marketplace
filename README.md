@@ -66,7 +66,7 @@ The platform leverages **The Graph Protocol** for efficient blockchain data inde
 
 ### Frontend
 
-- **[Next.js 16.0.3](https://nextjs.org/)** - React framework for production
+- **[Next.js 16.0.7](https://nextjs.org/)** - React framework for production
 - **[React 19](https://react.dev/)** - UI library
 - **[TypeScript](https://www.typescriptlang.org/)** - Type-safe JavaScript
 - **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework
