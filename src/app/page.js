@@ -66,6 +66,13 @@ export default function MarketplacePage() {
                         <span>Trade Safely</span>
                     </div>
                 </div>
+                <div>
+                    <p className="text-gray-600 text-[14px] mt-6">
+                        <span className="font-semibold">⚠️ Important Notice: </span>This platform is running on sepolia
+                        network. Do NOT use real funds when interacting with the marketplace. Only sepolia ETH should be
+                        used.
+                    </p>
+                </div>
             </div>
         );
     }
