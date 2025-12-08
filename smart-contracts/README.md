@@ -37,17 +37,17 @@ The main marketplace contract with the following functions:
 
 hardhat-marketplace/
 ├── contracts/
-│   ├── NftMarketplace.sol
-│   └── test/
-│       └── MockERC721.sol
+│ ├── NftMarketplace.sol
+│ └── test/
+│ └── MockERC721.sol
 ├── ignition/
-│   └── modules/
-│       └── NftMarketplaceModule.js
+│ └── modules/
+│ └── NftMarketplaceModule.js
 ├── test/
-│   ├── unit/
-│   │   └── nftMarketUnitTest.js
-│   └── staging/
-│       └── nftMarketStagingTest.js
+│ ├── unit/
+│ │ └── nftMarketUnitTest.js
+│ └── staging/
+│ └── nftMarketStagingTest.js
 ├── hardhat.config.js
 ├── package.json
 └── README.md
@@ -60,20 +60,20 @@ hardhat-marketplace/
 
 ## Installation
 
-1. Clone the repository:
+- Clone the repository:
 
 ```bash
 git clone https://github.com/ndubuisi-ugwuja/nft-marketplace-contract.git
 cd nft-marketplace-contract
 ```
 
-2. Install dependencies:
+- Install dependencies:
 
 ```bash
 yarn install
 ```
 
-3. Create a `.env` file in the root directory:
+- Create a `.env` file in the root directory:
 
 ```env
 SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY
