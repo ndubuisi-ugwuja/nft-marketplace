@@ -1,15 +1,15 @@
 # Decentralized NFT Marketplace
 
-A fully functional, production-ready NFT marketplace built on Ethereum where users can mint, buy, sell, and trade NFTs in a trustless and decentralized manner.
+A fully functional NFT marketplace built on Ethereum where users can mint, buy, sell, and trade NFTs in a trustless and decentralized manner.
 
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
 - [Features](#-features)
-- [Tech Stack](#-tech-stack)
+- [Tech Stack](#️-tech-stack)
 - [Getting Started](#-getting-started)
 - [Installation](#-installation)
-- [Configuration](#configuration)
+- [Configuration](#️-configuration)
 - [Usage](#-usage)
 - [Subgraph Deployment](#-subgraph-deployment)
 - [Contributing](#-contributing)
@@ -62,7 +62,7 @@ The platform leverages **The Graph Protocol** for efficient blockchain data inde
 
 ---
 
-## 🛠️ Tech-Stack
+## 🛠️ Tech Stack
 
 ### Frontend
 
