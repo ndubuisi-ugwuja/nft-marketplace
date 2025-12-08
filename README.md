@@ -7,6 +7,7 @@ A fully functional NFT marketplace built on Ethereum where users can mint, buy, 
 - [Overview](#-overview)
 - [Features](#-features)
 - [Tech Stack](#️-tech-stack)
+- [Smart Contracts](#-smart-contracts)
 - [Getting Started](#-getting-started)
 - [Installation](#-installation)
 - [Configuration](#️-configuration)
