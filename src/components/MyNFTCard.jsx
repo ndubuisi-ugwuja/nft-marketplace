@@ -1,9 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { resolveIPFS } from "@/lib/alchemy";
+import { resolveIPFS } from "../lib/alchemy";
 
-export default function MyNFTCard({ nft }) {
+export default function MyNFTCard({ nft, isListed }) {
     const router = useRouter();
+
+    console.log(`NFT ${nft.tokenId} - isListed:`, isListed);
 
     // Validate NFT data
     if (!nft?.contract?.address || !nft?.tokenId) {
@@ -50,12 +52,16 @@ export default function MyNFTCard({ nft }) {
                 )}
 
                 <div className="text-xs text-gray-500 mb-3">Token ID: {nft.tokenId}</div>
-
                 <button
-                    onClick={handleSell}
-                    className="w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 font-semibold transition"
+                    onClick={isListed ? undefined : handleSell}
+                    disabled={isListed}
+                    className={`w-full py-3 rounded-lg font-semibold transition ${
+                        isListed
+                            ? "bg-gray-100 text-gray-400 font-semibold cursor-not-allowed"
+                            : "bg-gray-700 text-white hover:bg-gray-600 font-semibold transition"
+                    }`}
                 >
-                    Sell This NFT
+                    {isListed ? "NFT is Listed" : "Sell This NFT"}
                 </button>
             </div>
         </div>

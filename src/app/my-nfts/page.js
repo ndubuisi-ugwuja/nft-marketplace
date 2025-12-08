@@ -1,11 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
+import { readContract } from "@wagmi/core";
 import { alchemyAPI } from "../../lib/alchemy";
 import MyNFTCard from "../../components/MyNFTCard";
+import { config } from "../../lib/wagmi";
+import { MARKETPLACE_ABI, MARKETPLACE_CONTRACT_ADDRESS } from "../../lib/marketplace";
 
 export default function MyNFTsPage() {
     const [nfts, setNfts] = useState([]);
+    const [listedNFTs, setListedNFTs] = useState(new Set());
     const [loading, setLoading] = useState(false);
     const { address, isConnected } = useAccount();
 
@@ -78,10 +82,55 @@ export default function MyNFTsPage() {
 
             console.log("Final NFTs with metadata:", nftsWithMetadata);
             setNfts(nftsWithMetadata);
+
+            // Check listing status for all NFTs
+            await checkListingStatus(nftsWithMetadata);
         } catch (error) {
             console.error("Error loading NFTs:", error);
         }
         setLoading(false);
+    };
+
+    const checkListingStatus = async (nftList) => {
+        try {
+            console.log("=== CHECKING LISTING STATUS ===");
+            const listedSet = new Set();
+
+            // Check each NFT if it's listed
+            for (const nft of nftList) {
+                try {
+                    const tokenIdBigInt = BigInt(nft.tokenId);
+
+                    // Call marketplace contract's getListing function
+                    const listing = await readContract(config, {
+                        address: MARKETPLACE_CONTRACT_ADDRESS,
+                        abi: MARKETPLACE_ABI,
+                        functionName: "getListing",
+                        args: [nft.contract.address, tokenIdBigInt],
+                    });
+
+                    // Listing is returned as array: [price, seller]
+                    // Index 0 = price, Index 1 = seller
+                    const price = listing[0];
+                    const seller = listing[1];
+
+                    console.log(`NFT ${nft.tokenId} - Price: ${price?.toString()}, Seller: ${seller}`);
+
+                    // Check if listing is active (price > 0 means it's listed)
+                    if (price && price > 0n) {
+                        listedSet.add(`${nft.contract.address}-${nft.tokenId}`);
+                        console.log(`✅ NFT ${nft.tokenId} IS LISTED at price:`, price.toString());
+                    }
+                } catch (err) {
+                    console.log(`NFT ${nft.tokenId} not listed or error:`, err.message);
+                }
+            }
+
+            console.log(`Found ${listedSet.size} listed NFTs`);
+            setListedNFTs(listedSet);
+        } catch (error) {
+            console.error("Error checking listing status:", error);
+        }
     };
 
     if (!isConnected) {
@@ -121,7 +170,11 @@ export default function MyNFTsPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {nfts.map((nft) => (
-                        <MyNFTCard key={`${nft.contract.address}-${nft.tokenId}`} nft={nft} />
+                        <MyNFTCard
+                            key={`${nft.contract.address}-${nft.tokenId}`}
+                            nft={nft}
+                            isListed={listedNFTs.has(`${nft.contract.address}-${nft.tokenId}`)}
+                        />
                     ))}
                 </div>
             )}
