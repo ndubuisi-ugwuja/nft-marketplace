@@ -1,4 +1,4 @@
-const SUBGRAPH_URL = "https://api.studio.thegraph.com/query/1718235/nft-marketplace-subgraph/v0.0.1";
+const SUBGRAPH_URL = process.env.NEXT_PUBLIC_SUBGRAPH_URL;
 
 export const getActiveListings = async () => {
     const query = `
