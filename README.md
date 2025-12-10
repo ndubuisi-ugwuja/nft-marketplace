@@ -1,6 +1,6 @@
 # Decentralized NFT Marketplace
 
-A fully functional NFT marketplace built on Ethereum where users can mint, buy, sell, and trade NFTs in a trustless and decentralized manner.
+A fully functional NFT marketplace built on Ethereum where users can buy, sell, and trade NFTs in a trustless and decentralized manner.
 
 ## 📋 Table of Contents
 
@@ -177,14 +177,14 @@ yarn hardhat ignition deploy ./ignition/modules/NftMarketplaceModule.js --networ
 ### Verify Contracts on Etherscan
 
 ```bash
-yarn hardhat verify --network sepolia <CONTRACT_ADDRESS>
+yarn hardhat verify --network sepolia
 ```
 
 ### Run Tests
 
 **Unit Tests (Local):**
 
-```bash
+```bash<CONTRACT_ADDRESS>
 yarn hardhat test
 ```
 
@@ -234,7 +234,7 @@ Create a `.env.local` file in the root directory:
 NEXT_PUBLIC_ALCHEMY_API_KEY=your_alchemy_api_key
 
 # Smart Contract
-NEXT_PUBLIC_MARKETPLACE_ADDRESS=0x9b1de83D8fd209573e48544D8e2E393c974003Ee
+NEXT_PUBLIC_MARKETPLACE_ADDRESS=0x9b1de83D8fd209573e48544D8e2E393c974003Ee or <YOUR_CONTRACT_ADDRESS>
 
 # Network
 NEXT_PUBLIC_CHAIN_ID=11155111
@@ -411,6 +411,7 @@ Give a ⭐️ if this project helped you!
 
 ## 📈 Roadmap
 
+- [ ] Add aditional smartcontract for minting NFT and update the frontend
 - [ ] Add support for ERC-1155 tokens
 - [ ] Implement auction functionality
 - [ ] Add collection pages
