@@ -372,6 +372,20 @@ Contributions are welcome! Please follow these steps:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+Suggestions:
+
+- [ ] Add aditional smartcontract for minting NFT and update the frontend
+- [ ] Add support for ERC-1155 tokens
+- [ ] Implement auction functionality
+- [ ] Add collection pages
+- [ ] Integrate ENS names
+- [ ] Add activity feed
+- [ ] Implement offer system
+- [ ] Add multiple blockchain support
+- [ ] Create mobile app
+
+---
+
 ### Code Style
 
 - Use ESLint and Prettier for code formatting
@@ -383,42 +397,12 @@ Contributions are welcome! Please follow these steps:
 
 ## 📝 License
 
-This project is licensed under the MIT License.
-
----
-
-## 🙏 Acknowledgments
-
-- [OpenZeppelin](https://www.openzeppelin.com/) - Secure smart contract library
-- [The Graph](https://thegraph.com/) - Blockchain indexing protocol
-- [RainbowKit](https://www.rainbowkit.com/) - Wallet connection UI
-- [Alchemy](https://www.alchemy.com/) - Blockchain infrastructure
-- [Thirdweb](https://thirdweb.com/) - NFT deployment tools
+This project is licensed under MIT. Feel free to use or adapt it for your own personal or commercial projects.
 
 ---
 
 ## Author
 
 Ndubuisi Ugwuja
-
----
-
-## 🌟 Show Your Support
-
-Give a ⭐️ if this project helped you!
-
----
-
-## 📈 Roadmap
-
-- [ ] Add aditional smartcontract for minting NFT and update the frontend
-- [ ] Add support for ERC-1155 tokens
-- [ ] Implement auction functionality
-- [ ] Add collection pages
-- [ ] Integrate ENS names
-- [ ] Add activity feed
-- [ ] Implement offer system
-- [ ] Add multiple blockchain support
-- [ ] Create mobile app
 
 ---
